@@ -1,13 +1,13 @@
-import string
-
 # FILE = "test.txt"
 # FILE = "test2.txt"
 FILE = "bags.txt"
 
+
 def parse_item(item):
-    item = item.strip().strip(".s")[:-len(" bag")].split(" ", 1)
+    item = item.strip().strip(".s")[: -len(" bag")].split(" ", 1)
     item[0] = int(item[0])
     return item
+
 
 rules = {}
 wanted = "shiny gold"
@@ -17,14 +17,15 @@ with open(FILE, "r") as f:
         line = line.strip()
         container, contents = line.split("bags", 1)
         container = container.strip()
-        
-        contents = contents.strip()[len("contain "):]
+
+        contents = contents.strip()[len("contain ") :]
         if contents.startswith("no"):
             contents = []
         else:
-            contents = [parse_item(item) for item in contents.split(",")]        
+            contents = [parse_item(item) for item in contents.split(",")]
 
         rules[container] = contents
+
 
 def part1():
     has_wanted = set()
@@ -47,14 +48,17 @@ def part1():
 
     print(len(has_wanted))
 
+
 def count_bags(container):
     total = 0
     for item in rules[container]:
         total += item[0] * (1 + count_bags(item[1]))
     return total
 
+
 def part2():
     print(count_bags(wanted))
+
 
 # part1()
 part2()

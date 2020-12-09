@@ -1,4 +1,3 @@
-import copy
 import sys
 
 # FILE = "test.txt"
@@ -79,7 +78,7 @@ def part2():
         else:
             continue
 
-        program_copy = copy.deepcopy(program)
+        program_copy = [inst[:] for inst in program]
         program_copy[ins][0] = instruction
 
         try_run(program_copy)
@@ -88,4 +87,13 @@ def part2():
 
 
 # part1()
-part2()
+# part2()
+
+
+def main():
+    import cProfile
+
+    cProfile.run("part2()")
+
+
+main()

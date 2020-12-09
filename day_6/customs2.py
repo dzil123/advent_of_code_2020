@@ -6,7 +6,7 @@ FILE = "customs.txt"
 groups = []
 
 with open(FILE, "r") as f:
-    group = set(string.ascii_lowercase) # set of chars, start with every possible item
+    group = set(string.ascii_lowercase)  # set of chars, start with every possible item
     for line in f:
         line = line.strip()
         if not line:  # newline, end of group
@@ -14,7 +14,7 @@ with open(FILE, "r") as f:
             groups.append(ans)
             group = set(string.ascii_lowercase)
             continue
-        group.intersection_update(line) # remove items in group that arent in line
+        group.intersection_update(line)  # remove items in group that arent in line
     ans = len(group)
     groups.append(ans)
     group = set(string.ascii_lowercase)

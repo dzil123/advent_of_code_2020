@@ -30,7 +30,7 @@ def part2():
     invalid = part1()
 
     for start_index in range(len(xmas)):
-        for end_index in range(PREAMBLE + 2, len(xmas) + 1):
+        for end_index in range(start_index + 2, len(xmas) + 1):
             array = xmas[start_index:end_index]
             total = sum(array)
 

@@ -11,8 +11,8 @@ with open(FILE, "r") as f:
             ans = len(set(group))
             groups.append(ans)
             group = ""
-        group += line # concat all responses within a group to a single string
-    ans = len(set(group)) # deduplicate the letters and count the length
+        group += line  # concat all responses within a group to a single string
+    ans = len(set(group))  # deduplicate the letters and count the length
     groups.append(ans)
     group = ""
 

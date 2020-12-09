@@ -29,9 +29,9 @@ def part1():
 def part2():
     invalid = part1()
 
-    for PREAMBLE in range(len(xmas)):
+    for start_index in range(len(xmas)):
         for end_index in range(PREAMBLE + 2, len(xmas) + 1):
-            array = xmas[PREAMBLE:end_index]
+            array = xmas[start_index:end_index]
             total = sum(array)
 
             if total == invalid:

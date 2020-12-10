@@ -82,6 +82,4 @@ def part2():
             raise Exception
 
 
-import cProfile
-
-cProfile.run("part2()")
+part2()

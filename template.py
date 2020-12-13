@@ -1,4 +1,5 @@
 FILE = "test.txt"
+# FILE = "test2.txt"
 # FILE = "puzzle.txt"
 
 

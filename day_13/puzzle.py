@@ -1,6 +1,3 @@
-from math import ceil
-import math
-
 # FILE = "test.txt"
 FILE = "puzzle.txt"
 

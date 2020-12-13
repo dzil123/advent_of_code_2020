@@ -56,6 +56,15 @@ def part2():
         else:
             return time
 
+def pprint(x):
+    print(f"{x: 9}", end=" ")
+
+def debug(x):
+    for divisor, remainder in get_mods():
+        pprint(x % divisor)
+    pprint(x)
+    print()
+
 
 # https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Search_by_sieving
 def part2reloaded():
@@ -65,6 +74,7 @@ def part2reloaded():
     for divisor, remainder in get_mods():
         while x % divisor != remainder:
             x += step
+            debug(x)
 
         step *= divisor
 
@@ -74,3 +84,4 @@ def part2reloaded():
 # print(part1())
 # print(part2())
 print(part2reloaded())
+print(get_mods())

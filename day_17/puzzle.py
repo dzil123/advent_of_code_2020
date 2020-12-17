@@ -1,10 +1,10 @@
 from collections import defaultdict
-
-# part 2, dimensions = 4
+import itertools
 
 # FILE = "test.txt"
 FILE = "puzzle.txt"
 
+DIMS = 4  # dimensions: 3 or 4
 
 ACTIVE = "#"
 INACTIVE = "."
@@ -16,26 +16,27 @@ def read():
         for x, line in enumerate(x for x in f if x.strip()):
             line = line.strip()
             for y, val in enumerate(line):
-                data[x, y, 0, 0] = val
+                pos = [0] * DIMS
+                pos[0:2] = x, y
+                pos = tuple(pos)
+
+                data[pos] = val
     return data
 
 
 def get_adj(data, pos):
     total = 0
 
-    for x_d in range(-1, 2):
-        for y_d in range(-1, 2):
-            for z_d in range(-1, 2):
-                for w_d in range(-1, 2):
-                    if (x_d, y_d, z_d, w_d) == (0, 0, 0, 0):
-                        continue
+    for deltas in itertools.product(range(-1, 2), repeat=DIMS):
+        if deltas == (0,) * DIMS:
+            continue
 
-                    new_pos = (pos[0] + x_d, pos[1] + y_d, pos[2] + z_d, pos[3] + w_d)
+        new_pos = tuple(sum(x) for x in zip(pos, deltas))
 
-                    # this access will generate an inactive if it doesnt exist yet, due to defaultdict
-                    # in this way we dont have
-                    if data[new_pos] == ACTIVE:
-                        total += 1
+        # this access will generate an inactive if it doesnt exist yet, due to defaultdict
+        # in this way we dont have
+        if data[new_pos] == ACTIVE:
+            total += 1
 
     return data[pos], total
 

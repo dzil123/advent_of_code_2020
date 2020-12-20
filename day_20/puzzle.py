@@ -5,7 +5,7 @@ from collections import deque, defaultdict, Counter
 
 FILE = "test.txt"
 # FILE = "test2.txt"
-# FILE = "puzzle.txt"
+FILE = "puzzle.txt"
 
 # 10x10 image
 
@@ -135,22 +135,11 @@ def same_tiles(tiles, sides):
                 side = Side(tile=tile, side=side)
                 variable[side.get()][side.tile.id].append(side)
     
-    # for key, val in variable.items():
-    #     seen = set()
-    #     new_val = []
-    #     for v in val:
-    #         if v.tile.id not in seen:
-    #             seen.add(v.tile.id)
-    #             new_val.append(v)
-    #     variable[key] = new_val
-    
     return variable
 
 def part1():
     tiles = read()
 
-    # tile_id, tile = tiles.popitem()
-    # return list(generate_orientations(tile))
 
     n_s = same_tiles(tiles, (0, 1))
     e_w = same_tiles(tiles, (2, 3))
@@ -159,17 +148,21 @@ def part1():
     # print()
     # pprint(e_w)
 
-    for d in (n_s, e_w):
-        # only_one = set()
-        # for k, v in d.items():
-        #     if len(v) == 1:
-        #         only_one.add(list(v)[0])
-        # print(only_one)
+    for d in (n_s, e_w): # why do both give the same answer?
         counter = Counter()
         for v in d.values():
-            if len(v) = 1:
+            if len(v) == 1: # if on the edge
                 counter.update(v.keys())
         print(counter.most_common())
+        total = 1
+        for x, n in counter.most_common():
+            if n == 4: # not sure why 4, when exists n=2
+                # maybe because 8 valid rotations of the unique solution, then halved because only one direction
+                print(x, end=" ")
+                total *= x
+        print()
+        print(total)
+        print()
 
 
 # pprint(read().popitem())

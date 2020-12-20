@@ -1,7 +1,7 @@
 import re
 import dataclasses
 from pprint import pprint
-from collections import deque, defaultdict
+from collections import deque, defaultdict, Counter
 
 FILE = "test.txt"
 # FILE = "test2.txt"
@@ -127,20 +127,49 @@ def generate_orientations(tile, hist=None, seen=None):
 
             yield from generate_orientations(new_tile, new_hist, seen)
 
+def same_tiles(tiles, sides):
+    variable = defaultdict(lambda: defaultdict(list))
+    for id, tile in tiles.items():
+        for tile in tile.generate_orientations(id):
+            for side in sides:
+                side = Side(tile=tile, side=side)
+                variable[side.get()][side.tile.id].append(side)
+    
+    # for key, val in variable.items():
+    #     seen = set()
+    #     new_val = []
+    #     for v in val:
+    #         if v.tile.id not in seen:
+    #             seen.add(v.tile.id)
+    #             new_val.append(v)
+    #     variable[key] = new_val
+    
+    return variable
+
 def part1():
     tiles = read()
 
     # tile_id, tile = tiles.popitem()
     # return list(generate_orientations(tile))
 
-    north_south = defaultdict(list)
-    for id, tile in tiles.items():
-        for tile in tile.generate_orientations(id):
-            for side in (0, 1):
-                side = Side(tile=tile, side=side)
-                north_south[side.get()].append(side)
-    
-    pprint(north_south)
+    n_s = same_tiles(tiles, (0, 1))
+    e_w = same_tiles(tiles, (2, 3))
+
+    pprint(n_s)
+    # print()
+    # pprint(e_w)
+
+    for d in (n_s, e_w):
+        # only_one = set()
+        # for k, v in d.items():
+        #     if len(v) == 1:
+        #         only_one.add(list(v)[0])
+        # print(only_one)
+        counter = Counter()
+        for v in d.values():
+            if len(v) = 1:
+                counter.update(v.keys())
+        print(counter.most_common())
 
 
 # pprint(read().popitem())

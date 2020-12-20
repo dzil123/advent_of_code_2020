@@ -5,7 +5,7 @@ from collections import deque, defaultdict, Counter
 
 FILE = "test.txt"
 # FILE = "test2.txt"
-FILE = "puzzle.txt"
+# FILE = "puzzle.txt"
 
 # 10x10 image
 
@@ -63,7 +63,7 @@ class Tile:
     def generate_orientations(self, id):
         ORIENTATIONS = [[], ['h'], ['h', 'r'], ['h', 'r', 'h'], ['h', 'r', 'r'], ['h', 'r', 'r', 'h'], ['h', 'r', 'r', 'r'], ['h', 'r', 'r', 'r', 'h']]
         for orientation in ORIENTATIONS:
-            yield OrientedTile(orientation=orientation, orig_tile=self, id=id)
+            yield OrientedTile(orientation=tuple(orientation), orig_tile=self, id=id)
 
 @dataclasses.dataclass(frozen=True)
 class OrientedTile:
@@ -140,7 +140,6 @@ def same_tiles(tiles, sides):
 def part1():
     tiles = read()
 
-
     n_s = same_tiles(tiles, (0, 1))
     e_w = same_tiles(tiles, (2, 3))
 
@@ -164,6 +163,45 @@ def part1():
         print(total)
         print()
 
+def adjacency(n_s, e_w):
+    # tiles = defaultdict(lambda: defaultdict) # dict[tile_id, dict[orientation, dict[side_int, Side]]]
+    # tiles = defaultdict(lambda: {}) # dict[tile_id, dict[Side, Side-other]]
+    tiles = defaultdict(lambda: {}) # dict[tile_id, dict[Side, Side-other]]
+
+    for d in (n_s, e_w):
+        for touching in d.values():
+            if len(touching) != 2:
+                continue
+            touching = list(touching.items())
+            print(touching)
+            for this, other in ((touching[0], touching[1]), (touching[1], touching[0])):
+                this_id, this_sides = this
+                other_sides = other[1]
+
+                print(this_id, this_sides, other_sides)
+
+                for this_side in this_sides:
+                    for other_side in other_sides:
+                        if this_side.side != other_side.side:
+                            print(" ", this_id, this_side, other_side)
+                            tiles[this_id][this_side] = other_side
+
+    # for key, value in tiles.items():
+    #     tiles[key] = dict(sorted(value.items()))
+
+    return tiles
+
+
+def part2():
+    tiles = read()
+
+    n_s = same_tiles(tiles, (0, 1))
+    e_w = same_tiles(tiles, (2, 3))
+
+    adjacent = adjacency(n_s, e_w)
+    pprint(adjacent)
+
 
 # pprint(read().popitem())
-print(part1())
+# print(part1())
+print(part2())

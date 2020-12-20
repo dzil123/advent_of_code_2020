@@ -1,7 +1,7 @@
 import re
 import dataclasses
 from pprint import pprint
-from collections import deque
+from collections import deque, defaultdict
 
 FILE = "test.txt"
 # FILE = "test2.txt"
@@ -10,11 +10,11 @@ FILE = "test.txt"
 # 10x10 image
 
 @dataclasses.dataclass(frozen=True)
-class Sides:
-    north: tuple[str]
-    south: tuple[str]
-    east: tuple[str]
-    west: tuple[str]
+class Tile:
+    north: tuple[str] # left to right
+    south: tuple[str] # left to right
+    east: tuple[str] # top to bottom
+    west: tuple[str] # top to bottom
 
     @classmethod
     def _create(cls, north, south, east, west):
@@ -29,6 +29,9 @@ class Sides:
 
         return cls._create(north, south, east, west)
 
+    def get_side(self, side: int):
+        return (self.north, self.south, self.east, self.west)[side]
+
     def rotate(self):
         north = self.west[::-1]
         south = self.east[::-1]
@@ -37,14 +40,6 @@ class Sides:
 
         return self._create(north, south, east, west)
     
-    def rotate_ccw(self):
-        north = self.east[:]
-        south = self.west[:]
-        east = self.south[::-1]
-        west = self.north[::-1]
-
-        return self._create(north, south, east, west)
-
     def flip_h(self):
         north = self.north[::-1]
         south = self.south[::-1]
@@ -53,27 +48,44 @@ class Sides:
 
         return self._create(north, south, east, west)
 
-    def flip_v(self):
-        north = self.south[:]
-        south = self.north[:]
-        east = self.east[::-1]
-        west = self.west[::-1]
-
-        return self._create(north, south, east, west)
-    
     def apply_rule(self, rule):
         if rule == "h":
             return self.flip_h()
         elif rule == "r":
             return self.rotate()
+    
+    def apply_rules(self, rules):
+        tile = self
+        for rule in rules:
+            tile = tile.apply_rule(rule)
+        return tile
 
-    def generate_orientations(self):
+    def generate_orientations(self, id):
         ORIENTATIONS = [[], ['h'], ['h', 'r'], ['h', 'r', 'h'], ['h', 'r', 'r'], ['h', 'r', 'r', 'h'], ['h', 'r', 'r', 'r'], ['h', 'r', 'r', 'r', 'h']]
-        for rules in ORIENTATIONS:
-            tile = self
-            for rule in rules:
-                tile = tile.apply_rule(rule)
-            yield (rules, tile)
+        for orientation in ORIENTATIONS:
+            yield OrientedTile(orientation=orientation, orig_tile=self, id=id)
+
+@dataclasses.dataclass(frozen=True)
+class OrientedTile:
+    orientation: tuple[str]
+    orig_tile: Tile
+    id: int
+    tile: Tile = dataclasses.field(init=False, compare=False)
+
+    def __post_init__(self):
+        # self.tile = self.orig_tile.apply_rules(self.orientation)
+        object.__setattr__(self, "tile", self.orig_tile.apply_rules(self.orientation))
+    
+    def __repr__(self):
+        return f"Tile({self.id}, {self.orientation})"
+
+@dataclasses.dataclass(frozen=True)
+class Side:
+    tile: OrientedTile
+    side: int # N=0, S=1, E=2, W=3
+
+    def get(self):
+        return self.tile.tile.get_side(self.side)
 
 def read_tile(f):
     R = r"Tile (\d+)\:"
@@ -87,7 +99,7 @@ def read_tile(f):
         row = [char == "#" for char in line if char in ".#"]
         tile.append(row)
     
-    return tile_id, Sides.make(tile)
+    return tile_id, Tile.make(tile)
 
 def read():
     tiles = {}
@@ -114,12 +126,21 @@ def generate_orientations(tile, hist=None, seen=None):
             yield new_hist
 
             yield from generate_orientations(new_tile, new_hist, seen)
-    
 
 def part1():
     tiles = read()
-    tile_id, tile = tiles.popitem()
-    return list(generate_orientations(tile))
+
+    # tile_id, tile = tiles.popitem()
+    # return list(generate_orientations(tile))
+
+    north_south = defaultdict(list)
+    for id, tile in tiles.items():
+        for tile in tile.generate_orientations(id):
+            for side in (0, 1):
+                side = Side(tile=tile, side=side)
+                north_south[side.get()].append(side)
+    
+    pprint(north_south)
 
 
 # pprint(read().popitem())

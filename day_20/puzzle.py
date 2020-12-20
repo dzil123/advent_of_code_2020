@@ -60,8 +60,20 @@ class Sides:
         west = self.west[::-1]
 
         return self._create(north, south, east, west)
-        # return cls(north=north, south=south, east=east, west=west)
+    
+    def apply_rule(self, rule):
+        if rule == "h":
+            return self.flip_h()
+        elif rule == "r":
+            return self.rotate()
 
+    def generate_orientations(self):
+        ORIENTATIONS = [[], ['h'], ['h', 'r'], ['h', 'r', 'h'], ['h', 'r', 'r'], ['h', 'r', 'r', 'h'], ['h', 'r', 'r', 'r'], ['h', 'r', 'r', 'r', 'h']]
+        for rules in ORIENTATIONS:
+            tile = self
+            for rule in rules:
+                tile = tile.apply_rule(rule)
+            yield (rules, tile)
 
 def read_tile(f):
     R = r"Tile (\d+)\:"
@@ -87,23 +99,27 @@ def read():
     
     return tiles
 
-def generate_orientations(tile):
-    seen = set()
-    queue = deque([tile])
+def generate_orientations(tile, hist=None, seen=None):
+    if hist is None:
+        hist = []
+    if seen is None:
+        seen = set()
+        seen.add(tile)
+        yield hist
 
-    while queue:
-        tile = queue.pop()
-        
-        # for new_tile in (tile.rotate(), tile.rotate_ccw(), tile.flip_h(), tile.flip_v()):
-        for new_tile in (tile.rotate(), tile.flip_h()):
-            if not new_tile in seen:
-                seen.add(new_tile)
-                queue.append(new_tile)
+    for op, new_tile in (("r", tile.rotate()), ("h", tile.flip_h()))[::-1]:
+        if not new_tile in seen:
+            new_hist = hist + [op]
+            seen.add(new_tile)
+            yield new_hist
+
+            yield from generate_orientations(new_tile, new_hist, seen)
     
-    return list(seen)
 
 def part1():
     tiles = read()
+    tile_id, tile = tiles.popitem()
+    return list(generate_orientations(tile))
 
 
 # pprint(read().popitem())

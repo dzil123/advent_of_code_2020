@@ -261,6 +261,15 @@ def rotate_full_tile(tile, orientation):
             tile = list(zip(*reversed(tile)))
     return tile
 
+def read_monster():
+    MONSTER = """
+                  # 
+#    ##    ##    ###
+ #  #  #  #  #  #   
+"""
+    monster = [[char == "#" for char in row ]for raw_row in MONSTER.split("\n") if (row := raw_row.strip("\n"))]
+    return monster
+
 def part2(data):
     raw_tiles, tiles = data
     size = (8, 8) # 10x10 tiles, trimmed on each edge
@@ -275,8 +284,7 @@ def part2(data):
     filled_image = {pos: rotate_full_tile(trimmed_raw_tiles[tile.id], tile.orientation) for pos, tile in image.items()}
 
     final_image = [[filled_image[low[0]+row//size[0], low[1]+col//size[1]][row%size[0]][col%size[1]] for col in range(size[1] * extents[1]) ] for row in range(size[0] * extents[0])]
-    final_image = [''.join(row) for row in final_image]
-    print('\n'.join(final_image))
+    print('\n'.join(''.join(row) for row in final_image))
 
 
 def run():

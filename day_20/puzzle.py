@@ -8,6 +8,8 @@ FILE = "test.txt"
 # FILE = "test2.txt"
 # FILE = "puzzle.txt"
 
+ORIENTATIONS = [[], ['h'], ['h', 'r'], ['h', 'r', 'h'], ['h', 'r', 'r'], ['h', 'r', 'r', 'h'], ['h', 'r', 'r', 'r'], ['h', 'r', 'r', 'r', 'h']]
+
 # only the sides
 @dataclasses.dataclass(frozen=True)
 class Tile:
@@ -61,7 +63,6 @@ class Tile:
         return tile
 
     def generate_orientations(self, id):
-        ORIENTATIONS = [[], ['h'], ['h', 'r'], ['h', 'r', 'h'], ['h', 'r', 'r'], ['h', 'r', 'r', 'h'], ['h', 'r', 'r', 'r'], ['h', 'r', 'r', 'r', 'h']]
         for orientation in ORIENTATIONS:
             yield OrientedTile(orientation=tuple(orientation), orig_tile=self, id=id)
 
@@ -167,8 +168,6 @@ def part1(data):
         print()
 
 def adjacency(n_s, e_w):
-    # tiles = defaultdict(lambda: defaultdict) # dict[tile_id, dict[orientation, dict[side_int, Side]]]
-    # tiles = defaultdict(lambda: {}) # dict[tile_id, dict[Side, Side-other]]
     tiles = defaultdict(lambda: {}) # dict[tile_id, dict[Side, Side-other]]
 
     for d in (n_s, e_w):
@@ -188,9 +187,6 @@ def adjacency(n_s, e_w):
                         if this_side.side != other_side.side:
                             # print(" ", this_id, this_side, other_side)
                             tiles[this_id][this_side] = other_side
-
-    # for key, value in tiles.items():
-    #     tiles[key] = dict(sorted(value.items()))
 
     return tiles
 
@@ -270,10 +266,13 @@ def read_monster():
     monster = [[char == "#" for char in row ]for raw_row in MONSTER.split("\n") if (row := raw_row.strip("\n"))]
     return monster
 
+def find_monster():
+    pass
+
 def part2(data):
     raw_tiles, tiles = data
     size = (8, 8) # 10x10 tiles, trimmed on each edge
-    # pprint(raw_tiles)
+    pprint(raw_tiles)
 
     image = assemble_tiles(tiles)
     low, high, extents = get_bounds(list(image.keys()))

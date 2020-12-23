@@ -1,8 +1,10 @@
 from collections import deque
+from pprint import pprint
 
-# FILE, MOVES = "test.txt", 10
+FILE, MOVES = "test.txt", 10
 # FILE, MOVES = "test.txt", 100
-FILE, MOVES = "puzzle.txt", 100
+# FILE, MOVES = "puzzle.txt", 100
+# FILE, MOVES = "puzzle.txt", 10_000_000
 
 def read():
     with open(FILE, "r") as f:
@@ -71,5 +73,83 @@ def part1():
     result = ''.join(str(n) for n in result)
     print(result)
 
+class Node:
+    __slots__ = ("num", "next")
 
-part1()
+    def __init__(self, num, next=None):
+        self.num = num
+        self.next = next
+    
+    def __repr__(self):
+        return f"Node({self.num} -> [{self.next}])"
+    
+
+def part2():
+    cups = read()
+
+    new_cups = [Node(cups[-1])]
+    for cup in cups[:-1][::-1]:
+        new_cups.insert(0, Node(cup, new_cups[0]))
+    
+    cups = new_cups
+
+    cup_lookup = {cup.num: cup for cup in cups}
+
+    cup = cups[-1]
+    # num_cups = 1_000_000
+    # num_cups = 15
+    num_cups = 9
+    for i in range(len(cups) + 1, num_cups + 1):
+        new_cup = Node(i)
+        cup.next = new_cup
+        # cups.append(new_cup)
+        cup_lookup[i] = new_cup
+        cup = new_cup
+    cup.next = cups[0]
+
+    print(len(cup_lookup))
+    print(cups[0].num, cups[-1].num, cups[-1].next.num)
+
+    MISSING = object()
+
+    current_cup = cups[0]
+    for i in range(MOVES):
+        holding = current_cup.next
+        current_cup.next = holding.next.next.next
+        holding.next.next.next = None
+
+        looking = current_cup.num
+        failed = 0
+        while True:
+            # subtract 1, mod num_cups but starts at 1 instead of 0
+            looking = (looking - 2) % num_cups + 1
+            if looking == holding.num or looking == holding.next.num or looking == holding.next.next.num:
+                failed += 1
+                continue
+            destination = cup_lookup[looking]
+            break
+
+        holding.next.next.next = destination.next
+        destination.next = holding
+
+        n = 1_000_000
+        if i % n == 0:
+            print(i, i/MOVES)
+    
+    cup_one = cup_lookup[1]
+    cup = cup_one
+    while True:
+        cup = cup.next
+        if cup is cup_one:
+            break
+        print(cup.num, end=" ")
+    print()
+
+    # pprint(cups)
+
+
+# part1()
+part2()
+
+# from cProfile import run
+# run("part2()")

@@ -6,7 +6,7 @@ import random
 
 FILE = "test.txt"
 # FILE = "test2.txt"
-# FILE = "puzzle.txt"
+FILE = "puzzle.txt"
 
 ORIENTATIONS = [[], ['h'], ['h', 'r'], ['h', 'r', 'h'], ['h', 'r', 'r'], ['h', 'r', 'r', 'h'], ['h', 'r', 'r', 'r'], ['h', 'r', 'r', 'r', 'h']]
 
@@ -266,8 +266,58 @@ def read_monster():
     monster = [[char == "#" for char in row ]for raw_row in MONSTER.split("\n") if (row := raw_row.strip("\n"))]
     return monster
 
-def find_monster():
-    pass
+def print_monster(monster):
+    print('\n' + '\n'.join(''.join('#' if pixel else ' ' for pixel in row) for row in monster) + '\n')
+
+def is_monster(image, monster, X, Y):
+    for x in range(len(monster)):
+        for y in range(len(monster[0])):
+            if monster[x][y]:
+                try:
+                    if not image[X+x][Y+y] == "#":
+                        return False
+                except IndexError:
+                    return False
+    return True
+
+def set_monster_bin(image_bin, monster, X, Y):
+    for x in range(len(monster)):
+        for y in range(len(monster[0])):
+            if monster[x][y]:
+                image_bin[X+x][Y+y] = True
+    return image_bin
+
+def final_tally(image, image_bin):
+    tally = 0
+    for x in range(len(image)):
+        for y in range(len(image[0])):
+            if image[x][y] == "#" and not image_bin[x][y]:
+                tally += 1
+    
+    return tally
+
+def find_monster(image):
+    image_bin = [ [ False for _ in range(len(image[0])) ] for _ in range(len(image)) ]
+
+    orig_monster = read_monster()
+    
+    found_monsters = 0
+    for orientation in ORIENTATIONS:
+        monster = rotate_full_tile(orig_monster, orientation)
+        # print_monster(monster)
+        
+        for x in range(len(image)):
+            for y in range(len(image[0])):
+                if is_monster(image, monster, x, y):
+                    print("found monster", orientation, (x, y))
+                    found_monsters += 1
+                    set_monster_bin(image_bin, monster, x, y)
+    
+    print_monster(image_bin)
+    print("found total", found_monsters)
+    print("result")
+    print("tally", final_tally(image, image_bin))    
+
 
 def part2(data):
     raw_tiles, tiles = data
@@ -284,6 +334,8 @@ def part2(data):
 
     final_image = [[filled_image[low[0]+row//size[0], low[1]+col//size[1]][row%size[0]][col%size[1]] for col in range(size[1] * extents[1]) ] for row in range(size[0] * extents[0])]
     print('\n'.join(''.join(row) for row in final_image))
+
+    find_monster(final_image)
 
 
 def run():

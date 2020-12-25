@@ -8,24 +8,27 @@ import itertools
 # FILE, MOVES = "puzzle.txt", 100
 FILE, MOVES = "puzzle.txt", 10_000_000
 
+
 def read():
     with open(FILE, "r") as f:
         line = f.readline().strip()
         return [int(n) for n in line]
 
+
 triggered = []
+
 
 def kprint(*args, **kwargs):
     if triggered:
         print(*args, **kwargs)
 
+
 def part1():
-    cups = read() # 1 to num_cups
+    cups = read()  # 1 to num_cups
     cups = deque(cups)
     num_cups = len(cups)
     print(cups)
     print()
-
 
     for i in range(MOVES):
         # if i > 10:
@@ -49,17 +52,19 @@ def part1():
             except ValueError:
                 failed += 1
                 pass
-        
+
         kprint(cups)
         kprint(holding)
         kprint(destination)
 
         # insert() puts it before the index, not after, so need to add 1
-        destination = (destination + 1) % (len(cups) + 1) # ahh i didnt add 1 to the len which cost so much time, thanks david
+        destination = (destination + 1) % (
+            len(cups) + 1
+        )  # ahh i didnt add 1 to the len which cost so much time, thanks david
         kprint(destination)
         for num in holding[::-1]:
             cups.insert(destination, num)
-        
+
         kprint(cups)
         cups.rotate(-1)
         kprint(cups)
@@ -68,12 +73,13 @@ def part1():
     print(cups)
     while cups[0] != 1:
         cups.rotate(-1)
-    
+
     print(cups)
     cups.popleft()
     result = list(cups)
-    result = ''.join(str(n) for n in result)
+    result = "".join(str(n) for n in result)
     print(result)
+
 
 class Node:
     __slots__ = ("num", "next")
@@ -81,7 +87,7 @@ class Node:
     def __init__(self, num, next=None):
         self.num = num
         self.next = next
-    
+
     def __repr__(self):
         return f"Node({self.num} -> [{self.next}])"
 
@@ -104,7 +110,7 @@ def part2():
     new_cups = [Node(cups[-1])]
     for cup in cups[:-1][::-1]:
         new_cups.insert(0, Node(cup, new_cups[0]))
-    
+
     cups = new_cups
 
     cup_lookup = {cup.num: cup for cup in cups}
@@ -146,7 +152,11 @@ def part2():
         while True:
             # subtract 1, mod num_cups but starts at 1 instead of 0
             looking = (looking - 2) % num_cups + 1
-            if looking == holding.num or looking == holding.next.num or looking == holding.next.next.num:
+            if (
+                looking == holding.num
+                or looking == holding.next.num
+                or looking == holding.next.next.num
+            ):
                 failed += 1
                 continue
             destination = cup_lookup[looking]
@@ -161,11 +171,11 @@ def part2():
 
         n = 1_000_000
         if i % n == 0:
-            print(i, i/MOVES)
-    
+            print(i, i / MOVES)
+
     cup_one = cup_lookup[1]
     cup = cup_one
-    print('result')
+    print("result")
     for _ in range(2):
         cup = cup.next
         if cup is cup_one:
